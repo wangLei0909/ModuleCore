@@ -22,7 +22,7 @@ namespace ModuleCore.Services
         /// <returns></returns>
         public static string EncrypToSHA(string Source)
         {
-            var sha256 = SHA256.Create();
+            SHA256Managed sha256 = new();
             byte[] s = UTF8Encoding.UTF8.GetBytes(Source);
             byte[] t = sha256.ComputeHash(s);
             return Convert.ToBase64String(t);
@@ -116,7 +116,7 @@ namespace ModuleCore.Services
         /// <returns>摘要</returns>
         public static byte[] MakeMd5(byte[] original)
         {
-            var hashmd5 = MD5.Create();
+            MD5CryptoServiceProvider hashmd5 = new();
             byte[] keyhash = hashmd5.ComputeHash(original);
             return keyhash;
         }
@@ -129,11 +129,11 @@ namespace ModuleCore.Services
         /// <returns>密文</returns>
         public static byte[] Encrypt(byte[] original, byte[] key)
         {
-            var des = TripleDES.Create();
-
-            des.Key = MakeMd5(key);
-            des.Mode = CipherMode.ECB;
-
+            TripleDESCryptoServiceProvider des = new()
+            {
+                Key = MakeMd5(key),
+                Mode = CipherMode.ECB
+            };
             return des.CreateEncryptor().TransformFinalBlock(original, 0, original.Length);
         }
 
@@ -145,11 +145,11 @@ namespace ModuleCore.Services
         /// <returns>明文</returns>
         public static byte[] Decrypt(byte[] encrypted, byte[] key)
         {
-            var des = TripleDES.Create();
-
-            des.Key = MakeMd5(key);
-            des.Mode = CipherMode.ECB;
-
+            TripleDESCryptoServiceProvider des = new()
+            {
+                Key = MakeMd5(key),
+                Mode = CipherMode.ECB
+            };
             return des.CreateDecryptor().TransformFinalBlock(encrypted, 0, encrypted.Length);
         }
     }
